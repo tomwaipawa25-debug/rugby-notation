@@ -263,20 +263,24 @@ html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--t
   <div class="acc-body" id="s-def">
     <div class="grid2">
       <div>
-        <span class="slbl l-b">✓ Held</span>
+        <span class="slbl l-b">✓ Tackles made</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">counts toward tackle total</span>
         <button class="sb" data-o="held" data-r="Dominant tackle" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Dominant tackle</button>
         <button class="sb" data-o="held" data-r="Gang tackled" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Gang tackled</button>
         <button class="sb" data-o="held" data-r="Tackled at the line (def)" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Tackled at line</button>
+        <button class="sb" data-o="beat" data-r="Tackled past line" data-f="f-a" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Tackled past line</button>
+        <span class="slbl l-b" style="margin-top:8px">✓ No tackle needed</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">does not count toward tackle total</span>
         <button class="sb" data-o="held" data-r="Forced error" data-f="f-b" data-sec="def" data-team="them" data-resets="them" onclick="tag(this)">Forced error</button>
         <button class="sb" data-o="held" data-r="Turnover won" data-f="f-b" data-sec="def" data-team="them" data-resets="them" onclick="tag(this)">Turnover won</button>
       </div>
       <div>
-        <span class="slbl l-a">✗ Beat us</span>
-        <button class="sb" data-o="beat" data-r="Missed tackle" data-f="f-a" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Missed tackle</button>
-        <button class="sb" data-o="beat" data-r="Tackled past line" data-f="f-a" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Tackled past line</button>
-        <button class="sb" data-o="beat" data-r="Line broken" data-f="f-a" data-sec="def" data-team="them" onclick="tag(this)">Line broken</button>
-        <button class="sb" data-o="beat" data-r="Overlap conceded" data-f="f-a" data-sec="def" data-team="them" onclick="tag(this)">Overlap conceded</button>
-        <button class="sb" data-o="beat" data-r="Beaten by skill" data-f="f-a" data-sec="def" data-team="them" onclick="tag(this)">Beaten by skill</button>
+        <span class="slbl l-a">✗ Defensive errors</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">does not count toward tackle total</span>
+        <button class="sb" data-o="beat" data-r="Missed tackle" data-f="f-a" data-sec="def" onclick="tag(this)">Missed tackle</button>
+        <button class="sb" data-o="beat" data-r="Line broken" data-f="f-a" data-sec="def" onclick="tag(this)">Line broken</button>
+        <button class="sb" data-o="beat" data-r="Overlap conceded" data-f="f-a" data-sec="def" onclick="tag(this)">Overlap conceded</button>
+        <button class="sb" data-o="beat" data-r="Beaten by skill" data-f="f-a" data-sec="def" onclick="tag(this)">Beaten by skill</button>
       </div>
     </div>
   </div>
