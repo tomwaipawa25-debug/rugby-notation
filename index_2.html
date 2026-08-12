@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rugby Notation">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.json">
+<title>Rugby Notation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f5f5f3;--bg3:#eeece6;
+  --text:#1a1a19;--text2:#5f5e5a;--text3:#888780;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.2);
+  --radius:8px;--radius-lg:12px;
+  --green:#27500A;--green-bg:#EAF3DE;--green-border:#639922;
+  --blue:#0C447C;--blue-bg:#E6F1FB;--blue-border:#185FA5;
+  --amber:#633806;--amber-bg:#FAEEDA;--amber-border:#854F0B;
+  --red:#791F1F;--red-bg:#FCEBEB;--red-border:#A32D2D;
+  --purple:#3C3489;--purple-bg:#EEEDFE;--purple-border:#534AB7;
+  --teal:#085041;--teal-bg:#E1F5EE;--teal-border:#0F6E56;
+  --gray:#444441;--gray-bg:#F1EFE8;--gray-border:#5F5E5A;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#252523;--bg3:#2e2e2b;
+    --text:#f0ede6;--text2:#b4b2a9;--text3:#888780;
+    --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.18);
+    --green:#C0DD97;--green-bg:#173404;--green-border:#3B6D11;
+    --blue:#B5D4F4;--blue-bg:#042C53;--blue-border:#185FA5;
+    --amber:#FAC775;--amber-bg:#412402;--amber-border:#854F0B;
+    --red:#F7C1C1;--red-bg:#501313;--red-border:#A32D2D;
+    --purple:#CECBF6;--purple-bg:#26215C;--purple-border:#534AB7;
+    --teal:#9FE1CB;--teal-bg:#04342C;--teal-border:#0F6E56;
+    --gray:#D3D1C7;--gray-bg:#2C2C2A;--gray-border:#5F5E5A;
+  }
+}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
+/* NAV */
+.nav{display:flex;background:var(--bg);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-btn{flex:1;padding:12px 4px 10px;font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .15s}
+.nav-btn.active{color:var(--green-border)}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* TABS */
+.tab{display:none;padding:12px 14px 80px}
+.tab.active{display:block}
+/* ZONE BAR */
+.zone-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px}
+.zone-btn{padding:8px 4px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg2);cursor:pointer;text-align:center;transition:background .1s;-webkit-tap-highlight-color:transparent}
+.zone-btn.active-att{background:var(--green-bg);border-color:var(--green-border)}
+.zone-btn.active-mid{background:var(--blue-bg);border-color:var(--blue-border)}
+.zone-btn.active-def{background:var(--amber-bg);border-color:var(--amber-border)}
+.zone-lbl{font-size:11px;font-weight:500}
+.zone-sub{font-size:10px;margin-top:1px;opacity:.8}
+.zone-att-c{color:var(--green)}.zone-mid-c{color:var(--blue)}.zone-def-c{color:var(--amber)}
+.zone-indicator{font-size:11px;padding:5px 10px;border-radius:var(--radius);margin-bottom:8px;text-align:center;background:var(--bg2);color:var(--text3)}
+.zone-indicator.ind-att{background:var(--green-bg);color:var(--green)}
+.zone-indicator.ind-mid{background:var(--blue-bg);color:var(--blue)}
+.zone-indicator.ind-def{background:var(--amber-bg);color:var(--amber)}
+/* PASSIVE BAR */
+.passive-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--bg2);border-radius:var(--radius);padding:8px 10px;margin-bottom:8px;align-items:center}
+.pb-item{text-align:center}
+.pb-lbl{font-size:9px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.pb-val{font-size:17px;font-weight:500;color:var(--text);line-height:1}
+.pb-sub{font-size:9px;color:var(--text3);margin-top:1px}
+.pb-div{width:0.5px;background:var(--border);align-self:stretch;margin:0 2px}
+/* ACC */
+.acc-btn{width:100%;display:flex;justify-content:space-between;align-items:center;padding:10px 13px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg);cursor:pointer;margin-bottom:5px;-webkit-tap-highlight-color:transparent}
+.acc-btn.open{border-radius:var(--radius) var(--radius) 0 0;margin-bottom:0;border-bottom-color:transparent}
+.acc-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--text)}
+.acc-right{display:flex;align-items:center;gap:6px}
+.acc-count{font-size:11px;padding:2px 7px;border-radius:var(--radius);font-weight:500}
+.chv{font-size:13px;color:var(--text3);transition:transform .2s;display:inline-block}
+.open .chv{transform:rotate(180deg)}
+.acc-body{border:0.5px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:10px;margin-bottom:5px;display:none;background:var(--bg)}
+.acc-body.visible{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.slbl{font-size:11px;font-weight:500;margin-bottom:5px;padding:3px 8px;border-radius:var(--radius);display:inline-block}
+.sb{display:block;width:100%;text-align:left;font-size:12px;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;margin-bottom:5px;-webkit-tap-highlight-color:transparent;transition:opacity .1s}
+.sb:active{opacity:.7}
+.sb:last-child{margin-bottom:0}
+/* FLASH CLASSES */
+.f-g{background:var(--green-bg)!important;border-color:var(--green-border)!important;color:var(--green)!important;font-weight:500}
+.f-r{background:var(--red-bg)!important;border-color:var(--red-border)!important;color:var(--red)!important;font-weight:500}
+.f-b{background:var(--blue-bg)!important;border-color:var(--blue-border)!important;color:var(--blue)!important;font-weight:500}
+.f-a{background:var(--amber-bg)!important;border-color:var(--amber-border)!important;color:var(--amber)!important;font-weight:500}
+.f-p{background:var(--purple-bg)!important;border-color:var(--purple-border)!important;color:var(--purple)!important;font-weight:500}
+.f-t{background:var(--teal-bg)!important;border-color:var(--teal-border)!important;color:var(--teal)!important;font-weight:500}
+.f-gy{background:var(--gray-bg)!important;border-color:var(--gray-border)!important;color:var(--gray)!important;font-weight:500}
+/* BADGE LABELS */
+.l-g{background:var(--green-bg);color:var(--green)}
+.l-r{background:var(--red-bg);color:var(--red)}
+.l-b{background:var(--blue-bg);color:var(--blue)}
+.l-a{background:var(--amber-bg);color:var(--amber)}
+.l-p{background:var(--purple-bg);color:var(--purple)}
+.l-t{background:var(--teal-bg);color:var(--teal)}
+.l-gy{background:var(--gray-bg);color:var(--gray)}
+/* STATS PANEL */
+.dom-wrap{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:10px 13px;margin-top:6px}
+.dom-row{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;margin-bottom:6px}
+.dom-num{font-size:34px;font-weight:500;color:var(--text);line-height:1}
+.bar-track{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:2px}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px}
+.stat{background:var(--bg2);border-radius:var(--radius);padding:7px 8px;text-align:center}
+.stat-l{font-size:10px;color:var(--text3);margin-bottom:2px;line-height:1.2}
+.stat-v{font-size:15px;font-weight:500;color:var(--text);line-height:1}
+.sec-micro{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.ratio-card{background:var(--bg2);border-radius:var(--radius);padding:8px 10px;margin-bottom:5px}
+.ratio-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.ratio-lbl{font-size:11px;color:var(--text2)}
+.ratio-val{font-size:13px;font-weight:500;color:var(--text)}
+.ratio-sub{font-size:10px;color:var(--text3)}
+.comp-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:0.5px solid var(--border)}
+.comp-row:last-child{border-bottom:none}
+.comp-lbl{font-size:10px;color:var(--text2)}
+.comp-val{font-size:10px;font-weight:500;color:var(--text)}
+/* ZONE BREAKDOWN */
+.zone-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:5px}
+.zb-card{background:var(--bg2);border-radius:var(--radius);padding:7px 8px}
+.zb-title{font-size:10px;font-weight:500;margin-bottom:4px}
+.zb-row{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);padding:1px 0}
+.zb-num{font-weight:500;color:var(--text)}
+/* LOG */
+.log-box{border:0.5px solid var(--border);border-radius:var(--radius);background:var(--bg);max-height:140px;overflow-y:auto;margin-top:8px}
+.log-hdr{font-size:11px;font-weight:500;color:var(--text2);padding:7px 10px;border-bottom:0.5px solid var(--border)}
+.log-row{font-size:11px;color:var(--text2);padding:5px 10px;border-bottom:0.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:6px}
+.log-row:last-child{border-bottom:none}
+.bdg{font-size:10px;padding:1px 7px;border-radius:var(--radius);white-space:nowrap;flex-shrink:0}
+.ph-bdg{font-size:10px;padding:1px 5px;border-radius:var(--radius);background:var(--bg3);color:var(--text3);white-space:nowrap;flex-shrink:0}
+.zn-att{background:var(--green-bg);color:var(--green);font-size:10px;padding:1px 5px;border-radius:var(--radius);white-space:nowrap;flex-shrink:0}
+.zn-mid{background:var(--blue-bg);color:var(--blue);font-size:10px;padding:1px 5px;border-radius:var(--radius);white-space:nowrap;flex-shrink:0}
+.zn-def{background:var(--amber-bg);color:var(--amber);font-size:10px;padding:1px 5px;border-radius:var(--radius);white-space:nowrap;flex-shrink:0}
+/* ACTION ROW */
+.act{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{font-size:12px;padding:8px 14px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.btn:active{opacity:.7}
+/* REPORT TAB */
+.report-section{margin-bottom:1.5rem}
+.rs-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.rs-blurb{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.score-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.scard{background:var(--bg2);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.scard-l{font-size:11px;color:var(--text3);margin-bottom:3px}
+.scard-v{font-size:20px;font-weight:500;color:var(--text);line-height:1}
+.scard-s{font-size:10px;color:var(--text2);margin-top:2px}
+.dom-bar-wrap{background:var(--bg2);border-radius:var(--radius);padding:10px;margin-bottom:8px}
+.dom-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:5px}
+.dom-track{height:10px;background:var(--bg3);border-radius:5px;overflow:hidden;position:relative}
+.dom-fill{height:100%;border-radius:5px}
+.dom-mid{position:absolute;top:0;left:50%;width:1px;height:100%;background:var(--border2)}
+.zone-rpt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.zrcard{border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg);padding:8px}
+.zr-title{font-size:10px;font-weight:500;margin-bottom:6px}
+.zr-bar-row{margin-bottom:4px}
+.zr-bar-label{font-size:9px;color:var(--text3);margin-bottom:1px}
+.zr-bar-track{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.zr-bar-fill{height:100%;border-radius:3px}
+.zr-bar-val{font-size:9px;color:var(--text2);margin-top:1px}
+.ratio-viz-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.rv-label{font-size:10px;color:var(--text2);width:120px;flex-shrink:0;text-align:right;line-height:1.3}
+.rv-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;display:flex}
+.rv-us{height:100%;background:#B5D4F4}
+.rv-them{height:100%;background:#F7C1C1}
+.rv-val{font-size:10px;color:var(--text3);width:40px;flex-shrink:0}
+.phase-compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.phase-ccard{background:var(--bg2);border-radius:var(--radius);padding:10px}
+.pc-title{font-size:10px;color:var(--text3);margin-bottom:6px}
+.pc-bars{display:flex;gap:8px;align-items:flex-end;height:70px}
+.pc-bar-w{flex:1;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.pc-bar{width:100%;border-radius:var(--radius) var(--radius) 0 0}
+.pc-val{font-size:11px;font-weight:500;color:var(--text);margin-bottom:3px}
+.pc-lbl{font-size:9px;color:var(--text3);margin-top:3px}
+/* HISTORY TAB */
+.hist-card{background:var(--bg2);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px}
+.hist-date{font-size:11px;color:var(--text3);margin-bottom:4px}
+.hist-score{font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px}
+.hist-meta{font-size:11px;color:var(--text2)}
+.hist-actions{display:flex;gap:6px;margin-top:8px}
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchTab('notation',this)" aria-label="Notation">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg>
+    Notation
+  </button>
+  <button class="nav-btn" onclick="switchTab('report',this)" aria-label="Report">
+    <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+    Report
+  </button>
+  <button class="nav-btn" onclick="switchTab('history',this)" aria-label="History">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    History
+  </button>
+</nav>
+
+<!-- ========== NOTATION TAB ========== -->
+<div class="tab active" id="tab-notation">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;margin-top:4px">
+    <span style="font-size:14px;font-weight:500;color:var(--text)">Match notation</span>
+    <span style="font-size:12px;color:var(--text3)" id="ev-num">Event #1</span>
+  </div>
+
+  <div class="zone-bar">
+    <button class="zone-btn" id="zb-att" onclick="setZone('att',this)">
+      <div class="zone-lbl zone-att-c">Attacking</div>
+      <div class="zone-sub zone-att-c">opp 22 → line</div>
+    </button>
+    <button class="zone-btn" id="zb-mid" onclick="setZone('mid',this)">
+      <div class="zone-lbl zone-mid-c">Middle</div>
+      <div class="zone-sub zone-mid-c">22m → 22m</div>
+    </button>
+    <button class="zone-btn" id="zb-def" onclick="setZone('def',this)">
+      <div class="zone-lbl zone-def-c">Defensive</div>
+      <div class="zone-sub zone-def-c">our 22 → line</div>
+    </button>
+  </div>
+  <div class="zone-indicator" id="zone-indicator">No zone — tap to set</div>
+
+  <div class="passive-bar">
+    <div class="pb-item"><div class="pb-lbl">Our phase</div><div class="pb-val" id="our-phase" style="color:var(--green-border)">1</div><div class="pb-sub">active</div></div>
+    <div class="pb-div"></div>
+    <div class="pb-item"><div class="pb-lbl">Their phase</div><div class="pb-val" id="their-phase" style="color:var(--red-border)">1</div><div class="pb-sub">active</div></div>
+    <div class="pb-div"></div>
+    <div class="pb-item"><div class="pb-lbl">Tackles on us</div><div class="pb-val" id="t-passive-them">0</div><div class="pb-sub">auto</div></div>
+    <div class="pb-div"></div>
+    <div class="pb-item"><div class="pb-lbl">Our tackles</div><div class="pb-val" id="t-passive-us">0</div><div class="pb-sub">auto</div></div>
+  </div>
+
+  <!-- OFFENSE -->
+  <button class="acc-btn" onclick="toggle('s-off',this)">
+    <span class="acc-title">⚡ Offense — our carries</span>
+    <span class="acc-right"><span class="acc-count l-g" id="c-off">0</span><span class="chv">▾</span></span>
+  </button>
+  <div class="acc-body" id="s-off">
+    <div class="grid2">
+      <div>
+        <span class="slbl l-g">✓ Made line</span>
+        <button class="sb" data-o="made" data-r="Broke tackle" data-f="f-g" data-sec="off" data-team="us" data-tacklethem="1" onclick="tag(this)">Broke tackle</button>
+        <button class="sb" data-o="made" data-r="Overlap" data-f="f-g" data-sec="off" data-team="us" onclick="tag(this)">Overlap</button>
+        <button class="sb" data-o="made" data-r="Tackled at the line" data-f="f-g" data-sec="off" data-team="us" data-tacklethem="1" onclick="tag(this)">Tackled at line</button>
+        <button class="sb" data-o="made" data-r="Ran through a hole" data-f="f-g" data-sec="off" data-team="us" onclick="tag(this)">Ran through hole</button>
+      </div>
+      <div>
+        <span class="slbl l-r">✗ Not made</span>
+        <button class="sb" data-o="not" data-r="Error" data-f="f-r" data-sec="off" data-team="us" data-resets="us" onclick="tag(this)">Error</button>
+        <button class="sb" data-o="not" data-r="Tackled before line" data-f="f-r" data-sec="off" data-team="us" data-tacklethem="1" onclick="tag(this)">Tackled before line</button>
+        <button class="sb" data-o="not" data-r="Spot tackle" data-f="f-r" data-sec="off" data-team="us" data-tacklethem="1" onclick="tag(this)">Spot tackle</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEFENSE -->
+  <button class="acc-btn" onclick="toggle('s-def',this)">
+    <span class="acc-title">🛡 Defense — opp carries</span>
+    <span class="acc-right"><span class="acc-count l-b" id="c-def">0</span><span class="chv">▾</span></span>
+  </button>
+  <div class="acc-body" id="s-def">
+    <div class="grid2">
+      <div>
+        <span class="slbl l-b">✓ Tackles made</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">counts toward tackle total</span>
+        <button class="sb" data-o="held" data-r="Dominant tackle" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Dominant tackle</button>
+        <button class="sb" data-o="held" data-r="Gang tackled" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Gang tackled</button>
+        <button class="sb" data-o="held" data-r="Tackled at the line (def)" data-f="f-b" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Tackled at line</button>
+        <button class="sb" data-o="beat" data-r="Tackled past line" data-f="f-a" data-sec="def" data-team="them" data-tackleus="1" onclick="tag(this)">Tackled past line</button>
+        <span class="slbl l-b" style="margin-top:8px">✓ No tackle needed</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">does not count toward tackle total</span>
+        <button class="sb" data-o="held" data-r="Forced error" data-f="f-b" data-sec="def" data-team="them" data-resets="them" onclick="tag(this)">Forced error</button>
+        <button class="sb" data-o="held" data-r="Turnover won" data-f="f-b" data-sec="def" data-team="them" data-resets="them" onclick="tag(this)">Turnover won</button>
+      </div>
+      <div>
+        <span class="slbl l-a">✗ Defensive errors</span>
+        <span style="font-size:10px;color:var(--text3);display:block;margin-bottom:5px">does not count toward tackle total</span>
+        <button class="sb" data-o="beat" data-r="Missed tackle" data-f="f-a" data-sec="def" onclick="tag(this)">Missed tackle</button>
+        <button class="sb" data-o="beat" data-r="Line broken" data-f="f-a" data-sec="def" onclick="tag(this)">Line broken</button>
+        <button class="sb" data-o="beat" data-r="Overlap conceded" data-f="f-a" data-sec="def" onclick="tag(this)">Overlap conceded</button>
+        <button class="sb" data-o="beat" data-r="Beaten by skill" data-f="f-a" data-sec="def" onclick="tag(this)">Beaten by skill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKS MOVES -->
+  <button class="acc-btn" onclick="toggle('s-bm',this)">
+    <span class="acc-title">↔ Backs moves</span>
+    <span class="acc-right"><span class="acc-count l-p" id="c-bm">0</span><span class="chv">▾</span></span>
+  </button>
+  <div class="acc-body" id="s-bm">
+    <div class="grid2">
+      <div>
+        <span class="slbl l-p">Successful</span>
+        <button class="sb" data-o="bmade" data-r="BM: Line break" data-f="f-p" data-sec="bm" data-team="us" onclick="tag(this)">Line break</button>
+        <button class="sb" data-o="bmade" data-r="BM: Try scored" data-f="f-p" data-sec="bm" data-team="us" onclick="tag(this)">Try scored</button>
+        <button class="sb" data-o="bmade" data-r="BM: Advantage gained" data-f="f-p" data-sec="bm" data-team="us" onclick="tag(this)">Advantage gained</button>
+        <button class="sb" data-o="bmade" data-r="BM: Overlap created" data-f="f-p" data-sec="bm" data-team="us" onclick="tag(this)">Overlap created</button>
+        <button class="sb" data-o="bmade" data-r="BM: Penalty won" data-f="f-p" data-sec="bm" data-team="us" onclick="tag(this)">Penalty won</button>
+      </div>
+      <div>
+        <span class="slbl l-gy">Unsuccessful</span>
+        <button class="sb" data-o="bnot" data-r="BM: Turnover lost" data-f="f-gy" data-sec="bm" data-team="us" data-resets="us" onclick="tag(this)">Turnover lost</button>
+        <button class="sb" data-o="bnot" data-r="BM: No gain" data-f="f-gy" data-sec="bm" data-team="us" onclick="tag(this)">No gain</button>
+        <button class="sb" data-o="bnot" data-r="BM: Tackled flat" data-f="f-gy" data-sec="bm" data-team="us" data-tacklethem="1" onclick="tag(this)">Tackled flat</button>
+        <button class="sb" data-o="bnot" data-r="BM: Penalty conceded" data-f="f-gy" data-sec="bm" data-team="us" data-resets="us" onclick="tag(this)">Penalty conceded</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRIES -->
+  <button class="acc-btn" onclick="toggle('s-try',this)">
+    <span class="acc-title">🏆 Tries scored</span>
+    <span class="acc-right"><span class="acc-count l-t" id="c-try">0</span><span class="chv">▾</span></span>
+  </button>
+  <div class="acc-body" id="s-try">
+    <div class="grid2">
+      <div>
+        <span class="slbl l-t">Our tries</span>
+        <button class="sb" data-o="try-us" data-r="Try: Scrum" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Off a scrum</button>
+        <button class="sb" data-o="try-us" data-r="Try: Lineout" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Off a lineout</button>
+        <button class="sb" data-o="try-us" data-r="Try: Line break" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Line break</button>
+        <button class="sb" data-o="try-us" data-r="Try: Missed tackle" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Missed tackle</button>
+        <button class="sb" data-o="try-us" data-r="Try: Backs move" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Backs move</button>
+        <button class="sb" data-o="try-us" data-r="Try: Pick and go" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Pick and go</button>
+        <button class="sb" data-o="try-us" data-r="Try: Counter attack" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Counter attack</button>
+        <button class="sb" data-o="try-us" data-r="Try: Intercept" data-f="f-t" data-sec="try" data-team="us" data-resets="us" onclick="tag(this)">Intercept</button>
+      </div>
+      <div>
+        <span class="slbl l-r">Opp tries</span>
+        <button class="sb" data-o="try-them" data-r="OppTry: Scrum" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Off a scrum</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Lineout" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Off a lineout</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Line break" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Line break</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Missed tackle" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Missed tackle</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Backs move" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Backs move</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Pick and go" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Pick and go</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Counter attack" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Counter attack</button>
+        <button class="sb" data-o="try-them" data-r="OppTry: Intercept" data-f="f-r" data-sec="try" data-team="them" data-resets="them" onclick="tag(this)">Intercept</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISTAKES -->
+  <button class="acc-btn" onclick="toggle('s-err',this)">
+    <span class="acc-title">⚠ Mistakes</span>
+    <span class="acc-right"><span class="acc-count l-a" id="c-err">0</span><span class="chv">▾</span></span>
+  </button>
+  <div class="acc-body" id="s-err">
+    <div class="grid2">
+      <div>
+        <span class="slbl l-a">Our mistakes</span>
+        <button class="sb" data-o="err-us" data-r="OurErr: Knock on" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Knock on</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Forward pass" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Forward pass</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — offside" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — offside</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — high tackle" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — high tackle</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — not releasing" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — not releasing</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — ruck" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — ruck</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — scrum" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — scrum</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Pen — lineout" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Pen — lineout</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Ball lost" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Ball lost</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Ruck turnover" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Ruck turnover</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Poor kick" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Poor kick</button>
+        <button class="sb" data-o="err-us" data-r="OurErr: Card" data-f="f-a" data-sec="err" data-team="us" data-resets="us" onclick="tag(this)">Yellow/red card</button>
+      </div>
+      <div>
+        <span class="slbl l-gy">Their mistakes</span>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Knock on" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Knock on</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Forward pass" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Forward pass</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — offside" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — offside</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — high tackle" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — high tackle</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — not releasing" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — not releasing</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — ruck" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — ruck</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — scrum" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — scrum</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Pen — lineout" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Pen — lineout</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Ball lost" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Ball lost</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Ruck turnover" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Ruck turnover</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Poor kick" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Poor kick</button>
+        <button class="sb" data-o="err-them" data-r="TheirErr: Card" data-f="f-gy" data-sec="err" data-team="them" data-resets="them" onclick="tag(this)">Yellow/red card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS PANEL -->
+  <div class="dom-wrap">
+    <div class="dom-row">
+      <div>
+        <div class="dom-num" id="dom-score">—</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px" id="dom-label">Tag events to see score</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>0</span><span>50</span><span>100</span></div>
+        <div class="bar-track"><div class="bar-fill" id="dom-bar" style="width:0%;background:#888780"></div></div>
+        <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:2px" id="dom-ratio">—</div>
+      </div>
+    </div>
+    <div style="border-top:0.5px solid var(--border);padding-top:8px;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">What contributes</div>
+      <div class="comp-row"><span class="comp-lbl">Try differential (30%)</span><span class="comp-val" id="dom-c1">—</span></div>
+      <div class="comp-row"><span class="comp-lbl">Carry battle (25%)</span><span class="comp-val" id="dom-c2">—</span></div>
+      <div class="comp-row"><span class="comp-lbl">Error differential (20%)</span><span class="comp-val" id="dom-c3">—</span></div>
+      <div class="comp-row"><span class="comp-lbl">Phase retention (15%)</span><span class="comp-val" id="dom-c4">—</span></div>
+      <div class="comp-row"><span class="comp-lbl">Backs move success (10%)</span><span class="comp-val" id="dom-c5">—</span></div>
+    </div>
+    <div class="sec-micro" style="margin-bottom:4px">Core stats</div>
+    <div class="stats-grid" style="margin-bottom:10px">
+      <div class="stat"><div class="stat-l">Off %</div><div class="stat-v" id="d-off">—</div></div>
+      <div class="stat"><div class="stat-l">Def %</div><div class="stat-v" id="d-def">—</div></div>
+      <div class="stat"><div class="stat-l">Our tries</div><div class="stat-v" id="d-tus">0</div></div>
+      <div class="stat"><div class="stat-l">Opp tries</div><div class="stat-v" id="d-tth">0</div></div>
+    </div>
+    <div class="sec-micro" style="margin-bottom:4px">Zone breakdown</div>
+    <div class="zone-breakdown">
+      <div class="zb-card"><div class="zb-title zone-att-c">Attacking</div>
+        <div class="zb-row"><span>Events</span><span class="zb-num" id="z-att-total">0</span></div>
+        <div class="zb-row"><span>Off made</span><span class="zb-num" id="z-att-off">0</span></div>
+        <div class="zb-row"><span>Def held</span><span class="zb-num" id="z-att-def">0</span></div>
+        <div class="zb-row"><span>Tries</span><span class="zb-num" id="z-att-try">0</span></div>
+        <div class="zb-row"><span>Errors</span><span class="zb-num" id="z-att-err">0</span></div>
+      </div>
+      <div class="zb-card"><div class="zb-title zone-mid-c">Middle</div>
+        <div class="zb-row"><span>Events</span><span class="zb-num" id="z-mid-total">0</span></div>
+        <div class="zb-row"><span>Off made</span><span class="zb-num" id="z-mid-off">0</span></div>
+        <div class="zb-row"><span>Def held</span><span class="zb-num" id="z-mid-def">0</span></div>
+        <div class="zb-row"><span>Tries</span><span class="zb-num" id="z-mid-try">0</span></div>
+        <div class="zb-row"><span>Errors</span><span class="zb-num" id="z-mid-err">0</span></div>
+      </div>
+      <div class="zb-card"><div class="zb-title zone-def-c">Defensive</div>
+        <div class="zb-row"><span>Events</span><span class="zb-num" id="z-def-total">0</span></div>
+        <div class="zb-row"><span>Off made</span><span class="zb-num" id="z-def-off">0</span></div>
+        <div class="zb-row"><span>Def held</span><span class="zb-num" id="z-def-def">0</span></div>
+        <div class="zb-row"><span>Tries</span><span class="zb-num" id="z-def-try">0</span></div>
+        <div class="zb-row"><span>Errors</span><span class="zb-num" id="z-def-err">0</span></div>
+      </div>
+    </div>
+    <div class="sec-micro" style="margin-bottom:4px;margin-top:8px">Phase play</div>
+    <div class="ratio-card">
+      <div class="ratio-top"><span class="ratio-lbl">Avg phases/possession — us vs them</span><span class="ratio-val" id="r-ph-avg">—</span></div>
+      <div class="ratio-sub" id="r-ph-avg-sub">phases before loss of possession</div>
+    </div>
+    <div class="ratio-card">
+      <div class="ratio-top"><span class="ratio-lbl">Avg phases to try — us vs them</span><span class="ratio-val" id="r-ph-try">—</span></div>
+      <div class="ratio-sub" id="r-ph-try-sub">avg phase when tries were scored</div>
+    </div>
+    <div class="sec-micro" style="margin-bottom:4px;margin-top:8px">Ratios</div>
+    <div class="ratio-card">
+      <div class="ratio-top"><span class="ratio-lbl">Tackles to line breaks</span><span class="ratio-val" id="r-tlb">—</span></div>
+      <div class="ratio-sub">Their tackles on us : our line breaks</div>
+    </div>
+    <div class="ratio-card">
+      <div class="ratio-top"><span class="ratio-lbl">Errors — us vs them</span><span class="ratio-val" id="r-err">—</span></div>
+      <div class="ratio-sub">below 1:1 = cleaner team</div>
+    </div>
+
+    <div class="sec-micro" style="margin-bottom:4px;margin-top:8px">Composite efficiency</div>
+
+    <!-- DEFENSIVE EFFICIENCY CARD -->
+    <div class="ratio-card" style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span class="ratio-lbl" style="font-weight:500;color:var(--text)">Defensive efficiency</span>
+        <span style="font-size:18px;font-weight:500;color:var(--text)" id="def-comp-score">—</span>
+      </div>
+      <div class="bar-track" style="margin-bottom:8px">
+        <div class="bar-fill" id="def-comp-bar" style="width:0%;background:#185FA5"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px" id="def-comp-label">Tag defensive carries to see composite score</div>
+      <!-- component rows -->
+      <div style="border-top:0.5px solid var(--border);padding-top:8px">
+        <div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">What contributes</div>
+        <div class="comp-row"><span class="comp-lbl">Hold rate (30%)</span><span class="comp-val" id="def-c1">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Tries conceded (25%)</span><span class="comp-val" id="def-c2">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Missed tackle rate (20%)</span><span class="comp-val" id="def-c3">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Avg phases forced (15%)</span><span class="comp-val" id="def-c4">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Line breaks conceded (10%)</span><span class="comp-val" id="def-c5">—</span></div>
+      </div>
+    </div>
+
+    <!-- OFFENSIVE EFFICIENCY CARD -->
+    <div class="ratio-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span class="ratio-lbl" style="font-weight:500;color:var(--text)">Offensive efficiency</span>
+        <span style="font-size:18px;font-weight:500;color:var(--text)" id="off-comp-score">—</span>
+      </div>
+      <div class="bar-track" style="margin-bottom:8px">
+        <div class="bar-fill" id="off-comp-bar" style="width:0%;background:#639922"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-bottom:8px" id="off-comp-label">Tag offensive carries to see composite score</div>
+      <div style="border-top:0.5px solid var(--border);padding-top:8px">
+        <div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">What contributes</div>
+        <div class="comp-row"><span class="comp-lbl">Advantage line rate (30%)</span><span class="comp-val" id="off-c1">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Tries scored (25%)</span><span class="comp-val" id="off-c2">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Spot tackle rate (20%)</span><span class="comp-val" id="off-c3">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Avg phases to score (15%)</span><span class="comp-val" id="off-c4">—</span></div>
+        <div class="comp-row"><span class="comp-lbl">Line breaks made (10%)</span><span class="comp-val" id="off-c5">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="log-box">
+    <div class="log-hdr">Event log</div>
+    <div id="log-list"><div class="log-row" style="color:var(--text3)">No events tagged yet.</div></div>
+  </div>
+
+  <div class="act" style="padding-bottom:20px">
+    <button class="btn" onclick="undoLast()">↩ Undo</button>
+    <button class="btn" onclick="saveMatch()">💾 Save match</button>
+    <button class="btn" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn" onclick="buildReport()">📊 Report</button>
+  </div>
+</div>
+
+<!-- ========== REPORT TAB ========== -->
+<div class="tab" id="tab-report">
+  <div id="report-empty" class="empty">
+    <p>No report yet.</p>
+    <p style="margin-top:8px;font-size:12px">Tag a match and press Report in the Notation tab.</p>
+  </div>
+  <div id="report-content" style="display:none"></div>
+</div>
+
+<!-- ========== HISTORY TAB ========== -->
+<div class="tab" id="tab-history">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;margin-top:4px">
+    <span style="font-size:14px;font-weight:500;color:var(--text)">Match history</span>
+    <button class="btn" onclick="exportAllCSV()">⬇ Export all</button>
+  </div>
+  <div id="history-list"><div class="empty">No saved matches yet.</div></div>
+</div>
+
+<script>
+/* ── STATE ── */
+const tallies={};
+const secCounts={off:0,def:0,bm:0,try:0,err:0};
+const secCountEls={off:'c-off',def:'c-def',bm:'c-bm',try:'c-try',err:'c-err'};
+let history=[],evNum=1;
+let tacklesThem=0,tacklesUs=0;
+let ourPhase=1,theirPhase=1;
+let ourPossessions=[],theirPossessions=[];
+let ourCurrentPossStart=1,theirCurrentPossStart=1;
+let ourTryPhases=[],theirTryPhases=[];
+let currentZone=null;
+
+const bdgStyle={
+  made:'background:var(--green-bg);color:var(--green)',
+  not:'background:var(--red-bg);color:var(--red)',
+  held:'background:var(--blue-bg);color:var(--blue)',
+  beat:'background:var(--amber-bg);color:var(--amber)',
+  bmade:'background:var(--purple-bg);color:var(--purple)',
+  bnot:'background:var(--gray-bg);color:var(--gray)',
+  'try-us':'background:var(--teal-bg);color:var(--teal)',
+  'try-them':'background:var(--red-bg);color:var(--red)',
+  'err-us':'background:var(--amber-bg);color:var(--amber)',
+  'err-them':'background:var(--gray-bg);color:var(--gray)'
+};
+const lblMap={
+  made:'Made',not:'Not made',held:'Held',beat:'Beat us',
+  bmade:'BM ✓',bnot:'BM ✗',
+  'try-us':'Our try','try-them':'Opp try',
+  'err-us':'Our err','err-them':'Their err'
+};
+const zoneClass={att:'zn-att',mid:'zn-mid',def:'zn-def'};
+const zoneLbl={att:'ATT',mid:'MID',def:'DEF'};
+
+/* ── NAVIGATION ── */
+function switchTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='history')renderHistory();
+}
+
+/* ── ZONE ── */
+function setZone(zone,btn){
+  if(currentZone===zone){
+    currentZone=null;
+    document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active-att','active-mid','active-def'));
+    const ind=document.getElementById('zone-indicator');
+    ind.className='zone-indicator';ind.textContent='No zone — tap to set';
+    return;
+  }
+  currentZone=zone;
+  document.querySelectorAll('.zone-btn').forEach(b=>b.classList.remove('active-att','active-mid','active-def'));
+  btn.classList.add('active-'+zone);
+  const names={att:'Attacking third',mid:'Middle third',def:'Defensive third'};
+  const ind=document.getElementById('zone-indicator');
+  ind.className='zone-indicator ind-'+zone;
+  ind.textContent='Zone: '+names[zone];
+}
+
+/* ── ACCORDION ── */
+function toggle(id,btn){
+  const body=document.getElementById(id);
+  const isOpen=body.classList.contains('visible');
+  body.classList.toggle('visible',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+}
+
+/* ── TAG ── */
+function tag(btn){
+  const o=btn.dataset.o,r=btn.dataset.r,f=btn.dataset.f,sec=btn.dataset.sec;
+  const team=btn.dataset.team||null,resets=btn.dataset.resets||null;
+  const addTT=btn.dataset.tacklethem?1:0,addTU=btn.dataset.tackleus?1:0;
+  const zone=currentZone;
+  btn.classList.add(f);
+  setTimeout(()=>btn.classList.remove(f),500);
+  tallies[r]=(tallies[r]||0)+1;
+  if(secCounts[sec]!==undefined){secCounts[sec]++;document.getElementById(secCountEls[sec]).textContent=secCounts[sec];}
+  tacklesThem+=addTT;tacklesUs+=addTU;
+  document.getElementById('t-passive-them').textContent=tacklesThem;
+  document.getElementById('t-passive-us').textContent=tacklesUs;
+  const snapOur=ourPhase,snapTheir=theirPhase;
+  if(team==='us'){
+    if(o==='try-us')ourTryPhases.push(ourPhase);
+    ourPhase++;
+    if(resets==='us'){ourPossessions.push(ourPhase-ourCurrentPossStart);ourCurrentPossStart=1;ourPhase=1;}
+  } else if(team==='them'){
+    if(o==='try-them')theirTryPhases.push(theirPhase);
+    theirPhase++;
+    if(resets==='them'){theirPossessions.push(theirPhase-theirCurrentPossStart);theirCurrentPossStart=1;theirPhase=1;}
+  }
+  document.getElementById('our-phase').textContent=ourPhase;
+  document.getElementById('their-phase').textContent=theirPhase;
+  history.push({evNum,o,r,sec,team,resets,zone,addTT,addTU,
+    ourPossSnap:[...ourPossessions],theirPossSnap:[...theirPossessions],
+    ourTrySnap:[...ourTryPhases],theirTrySnap:[...theirTryPhases],
+    ourPhaseSnap:ourPhase,theirPhaseSnap:theirPhase,
+    ourCurrSnap:ourCurrentPossStart,theirCurrSnap:theirCurrentPossStart,
+    phaseUs:snapOur,phaseThem:snapTheir});
+  addLog(evNum,o,r,snapOur,snapTheir,team,zone);
+  evNum++;document.getElementById('ev-num').textContent='Event #'+evNum;
+  updateStats();
+}
+
+/* ── LOG ── */
+function addLog(num,o,r,phUs,phThem,team,zone){
+  const log=document.getElementById('log-list');
+  if(num===1)log.innerHTML='';
+  const row=document.createElement('div');row.className='log-row';
+  const bs=bdgStyle[o]||'';
+  const ph=team==='us'?'P'+phUs:team==='them'?'P'+phThem:'';
+  const zc=zone?zoneClass[zone]:'',zl=zone?zoneLbl[zone]:'';
+  row.innerHTML=`<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">#${num} ${r}</span>`
+    +`<div style="display:flex;gap:3px;align-items:center;flex-shrink:0">`
+    +(zl?`<span class="${zc}">${zl}</span>`:'')
+    +(ph?`<span class="ph-bdg">${ph}</span>`:'')
+    +`<span class="bdg" style="${bs}">${lblMap[o]}</span></div>`;
+  log.appendChild(row);log.scrollTop=log.scrollHeight;
+}
+
+/* ── STATS ── */
+const avg=arr=>arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:null;
+
+function updateStats(){
+  const off=history.filter(h=>h.o==='made'||h.o==='not');
+  const def=history.filter(h=>h.o==='held'||h.o==='beat');
+  const offMade=off.filter(h=>h.o==='made').length;
+  const defHeld=def.filter(h=>h.o==='held').length;
+  const tryUs=history.filter(h=>h.o==='try-us').length;
+  const tryThem=history.filter(h=>h.o==='try-them').length;
+  const errUs=history.filter(h=>h.o==='err-us').length;
+  const errThem=history.filter(h=>h.o==='err-them').length;
+  const aop=avg(ourPossessions),atp=avg(theirPossessions);
+  const aot=avg(ourTryPhases),att_=avg(theirTryPhases);
+  document.getElementById('d-tus').textContent=tryUs;
+  document.getElementById('d-tth').textContent=tryThem;
+  const offRate=off.length?offMade/off.length:null;
+  const defRate=def.length?defHeld/def.length:null;
+  document.getElementById('d-off').textContent=offRate!==null?Math.round(offRate*100)+'%':'—';
+  document.getElementById('d-def').textContent=defRate!==null?Math.round(defRate*100)+'%':'—';
+
+  /* ── DOMINANCE INDEX — 5-component weighted composite ── */
+  const hasData=history.length>0;
+  if(hasData){
+    const tryDiff=tryUs-tryThem;
+    const tryScore=Math.min(100,Math.max(0,50+(tryDiff*10)));
+    const carryScore=(()=>{
+      const rates=[];
+      if(offRate!==null)rates.push(offRate);
+      if(defRate!==null)rates.push(defRate);
+      return rates.length?rates.reduce((a,b)=>a+b,0)/rates.length*100:50;
+    })();
+    const totalErrors=errUs+errThem;
+    const errScore=totalErrors>0?Math.min(100,Math.max(0,((errThem/totalErrors)*100))):50;
+    const phaseScore=(()=>{
+      if(aop===null&&atp===null)return 50;
+      if(aop!==null&&atp!==null)return Math.min(100,Math.max(0,50+((aop-atp)*10)));
+      if(aop!==null)return Math.min(100,Math.max(0,(aop/6)*100));
+      return 50;
+    })();
+    const bm=history.filter(h=>h.o==='bmade'||h.o==='bnot');
+    const bmGood=history.filter(h=>h.o==='bmade').length;
+    const bmScore=bm.length?Math.round(bmGood/bm.length*100):50;
+    const score=Math.round(tryScore*0.30+carryScore*0.25+errScore*0.20+phaseScore*0.15+bmScore*0.10);
+    const domColor=score>=60?'#639922':score>=45?'#BA7517':'#A32D2D';
+    const domLabels=['Dominated','Under pressure','Even','Slight edge','Dominant'];
+    const domLbl=score>=70?domLabels[4]:score>=55?domLabels[3]:score>=45?domLabels[2]:score>=30?domLabels[1]:domLabels[0];
+    document.getElementById('dom-score').textContent=score;
+    document.getElementById('dom-bar').style.width=score+'%';
+    document.getElementById('dom-bar').style.background=domColor;
+    document.getElementById('dom-label').textContent=domLbl;
+    const us=score/100,them=1-us;
+    document.getElementById('dom-ratio').textContent=them>0?'Us '+(us/them).toFixed(2)+':1 them':'';
+    document.getElementById('dom-c1').textContent=tryUs+' scored, '+tryThem+' conceded (diff '+(tryDiff>0?'+':'')+tryDiff+')';
+    document.getElementById('dom-c2').textContent=(offRate!==null?Math.round(offRate*100)+'% off':'—')+' / '+(defRate!==null?Math.round(defRate*100)+'% def':'—');
+    document.getElementById('dom-c3').textContent='us '+errUs+' vs them '+errThem+(totalErrors>0?' ('+(errUs<errThem?'cleaner':'more errors')+')':'');
+    document.getElementById('dom-c4').textContent=aop!==null&&atp!==null?aop.toFixed(1)+' vs '+atp.toFixed(1)+' phases/poss':aop!==null?aop.toFixed(1)+' phases/poss':'no data yet';
+    document.getElementById('dom-c5').textContent=bm.length?bmGood+'/'+bm.length+' ('+bmScore+'%)':'no backs moves tagged';
+  } else {
+    document.getElementById('dom-score').textContent='—';
+    document.getElementById('dom-label').textContent='Tag events to see score';
+    document.getElementById('dom-bar').style.width='0%';
+    document.getElementById('dom-ratio').textContent='—';
+    ['dom-c1','dom-c2','dom-c3','dom-c4','dom-c5'].forEach(id=>document.getElementById(id).textContent='—');
+  }
+  ['att','mid','def'].forEach(z=>{
+    const zev=history.filter(h=>h.zone===z);
+    document.getElementById('z-'+z+'-total').textContent=zev.length;
+    document.getElementById('z-'+z+'-off').textContent=zev.filter(h=>h.o==='made').length;
+    document.getElementById('z-'+z+'-def').textContent=zev.filter(h=>h.o==='held').length;
+    document.getElementById('z-'+z+'-try').textContent=zev.filter(h=>h.o==='try-us'||h.o==='try-them').length;
+    document.getElementById('z-'+z+'-err').textContent=zev.filter(h=>h.o==='err-us'||h.o==='err-them').length;
+  });
+  const lb=history.filter(h=>h.r==='Ran through a hole'||h.r==='Broke tackle'||h.r==='BM: Line break'||h.r==='Try: Line break').length;
+  if(aop!==null||atp!==null){
+    document.getElementById('r-ph-avg').textContent=(aop!==null?aop.toFixed(1):'—')+' vs '+(atp!==null?atp.toFixed(1):'—');
+    document.getElementById('r-ph-avg-sub').textContent='us '+ourPossessions.length+' possessions / them '+theirPossessions.length;
+  }
+  if(aot!==null||att_!==null){
+    document.getElementById('r-ph-try').textContent=(aot!==null?aot.toFixed(1):'—')+' vs '+(att_!==null?att_.toFixed(1):'—');
+    document.getElementById('r-ph-try-sub').textContent='us ('+ourTryPhases.length+' tries) / them ('+theirTryPhases.length+')';
+  }
+  document.getElementById('r-tlb').textContent=lb>0?(tacklesThem+':'+lb+' ('+(tacklesThem/lb).toFixed(1)+'/break)'):'—';
+  document.getElementById('r-err').textContent=(errUs>0||errThem>0)?(errUs+':'+errThem):'—';
+
+  /* ── COMPOSITE DEFENSIVE EFFICIENCY ── */
+  if(def.length>0){
+    // 1. Hold rate (30%) — % of their carries we held
+    const holdRate=defHeld/def.length;
+    const holdScore=holdRate*100; // 0–100
+
+    // 2. Tries conceded (25%) — fewer is better; benchmark 0 tries = 100, 10+ tries = 0
+    const triesConceededScore=Math.max(0,100-(tryThem*10));
+
+    // 3. Missed tackle rate (20%) — missed tackles as % of all def carries, inverted
+    const missedTackles=history.filter(h=>h.r==='Missed tackle').length;
+    const missedRate=def.length?missedTackles/def.length:0;
+    const missedScore=Math.max(0,(1-missedRate)*100);
+
+    // 4. Avg phases forced (15%) — how many phases we made them go through (their possessions)
+    // More phases = better defence. Benchmark: 1 phase = 0, 8+ phases = 100
+    const avgTheirPossVal=avg(theirPossessions);
+    const phaseDefScore=avgTheirPossVal!==null?Math.min(100,((avgTheirPossVal-1)/7)*100):null;
+
+    // 5. Line breaks conceded (10%) — fewer is better; benchmark 0=100, 10+=0
+    const linesBrokenAgainst=history.filter(h=>h.r==='Line broken').length;
+    const lbScore=Math.max(0,100-(linesBrokenAgainst*10));
+
+    const defWeighted=
+      holdScore*0.30+
+      triesConceededScore*0.25+
+      missedScore*0.20+
+      (phaseDefScore!==null?phaseDefScore*0.15:holdScore*0.15)+
+      lbScore*0.10;
+    const defFinal=Math.round(defWeighted);
+    const defColor=defFinal>=70?'#639922':defFinal>=50?'#BA7517':'#A32D2D';
+    const defLabels=['Poor','Struggling','Moderate','Good','Excellent'];
+    const defLbl=defFinal>=80?defLabels[4]:defFinal>=65?defLabels[3]:defFinal>=50?defLabels[2]:defFinal>=35?defLabels[1]:defLabels[0];
+
+    document.getElementById('def-comp-score').textContent=defFinal+'/100';
+    document.getElementById('def-comp-bar').style.width=defFinal+'%';
+    document.getElementById('def-comp-bar').style.background=defColor;
+    document.getElementById('def-comp-label').textContent=defLbl+' — based on '+def.length+' opp carries';
+    document.getElementById('def-c1').textContent=Math.round(holdRate*100)+'% held ('+defHeld+'/'+def.length+')';
+    document.getElementById('def-c2').textContent=tryThem+' tries conceded';
+    document.getElementById('def-c3').textContent=missedTackles+' missed ('+Math.round(missedRate*100)+'% of carries)';
+    document.getElementById('def-c4').textContent=avgTheirPossVal!==null?avgTheirPossVal.toFixed(1)+' avg phases forced':'no data yet';
+    document.getElementById('def-c5').textContent=linesBrokenAgainst+' line breaks conceded';
+  }
+
+  /* ── COMPOSITE OFFENSIVE EFFICIENCY ── */
+  if(off.length>0){
+    // 1. Advantage line rate (30%)
+    const advRate=offMade/off.length;
+    const advScore=advRate*100;
+
+    // 2. Tries scored (25%) — more is better; benchmark 0=0, 8+=100
+    const triesScore=Math.min(100,tryUs*12.5);
+
+    // 3. Spot tackle rate (20%) — lower is better (less predictable)
+    const spotTackles=history.filter(h=>h.r==='Spot tackle').length;
+    const spotRate=off.length?spotTackles/off.length:0;
+    const spotScore=Math.max(0,(1-spotRate)*100);
+
+    // 4. Avg phases to score (15%) — fewer phases = more clinical. Benchmark: 1=100, 10+=0
+    const avgOurTryVal=avg(ourTryPhases);
+    const phaseOffScore=avgOurTryVal!==null?Math.max(0,100-((avgOurTryVal-1)/9)*100):null;
+
+    // 5. Line breaks made (10%)
+    const lineBreaksMade=history.filter(h=>h.r==='Ran through a hole'||h.r==='Broke tackle'||h.r==='BM: Line break'||h.r==='Try: Line break').length;
+    const lbMadeScore=Math.min(100,lineBreaksMade*8);
+
+    const offWeighted=
+      advScore*0.30+
+      triesScore*0.25+
+      spotScore*0.20+
+      (phaseOffScore!==null?phaseOffScore*0.15:advScore*0.15)+
+      lbMadeScore*0.10;
+    const offFinal=Math.round(offWeighted);
+    const offColor=offFinal>=70?'#639922':offFinal>=50?'#BA7517':'#A32D2D';
+    const offLabels=['Poor','Struggling','Moderate','Good','Excellent'];
+    const offLbl=offFinal>=80?offLabels[4]:offFinal>=65?offLabels[3]:offFinal>=50?offLabels[2]:offFinal>=35?offLabels[1]:offLabels[0];
+
+    document.getElementById('off-comp-score').textContent=offFinal+'/100';
+    document.getElementById('off-comp-bar').style.width=offFinal+'%';
+    document.getElementById('off-comp-bar').style.background=offColor;
+    document.getElementById('off-comp-label').textContent=offLbl+' — based on '+off.length+' our carries';
+    document.getElementById('off-c1').textContent=Math.round(advRate*100)+'% made line ('+offMade+'/'+off.length+')';
+    document.getElementById('off-c2').textContent=tryUs+' tries scored';
+    document.getElementById('off-c3').textContent=spotTackles+' spot tackles ('+Math.round(spotRate*100)+'% of carries)';
+    document.getElementById('off-c4').textContent=avgOurTryVal!==null?avgOurTryVal.toFixed(1)+' avg phases to score':'no data yet';
+    document.getElementById('off-c5').textContent=lineBreaksMade+' line breaks made';
+  }
+}
+
+/* ── UNDO ── */
+function undoLast(){
+  if(!history.length)return;
+  const last=history.pop();
+  tallies[last.r]--;
+  if(secCounts[last.sec]!==undefined){secCounts[last.sec]--;document.getElementById(secCountEls[last.sec]).textContent=secCounts[last.sec];}
+  tacklesThem-=last.addTT;tacklesUs-=last.addTU;
+  document.getElementById('t-passive-them').textContent=tacklesThem;
+  document.getElementById('t-passive-us').textContent=tacklesUs;
+  evNum--;document.getElementById('ev-num').textContent='Event #'+evNum;
+  ourPhase=last.ourPhaseSnap;theirPhase=last.theirPhaseSnap;
+  ourPossessions=[...last.ourPossSnap];theirPossessions=[...last.theirPossSnap];
+  ourTryPhases=[...last.ourTrySnap];theirTryPhases=[...last.theirTrySnap];
+  ourCurrentPossStart=last.ourCurrSnap;theirCurrentPossStart=last.theirCurrSnap;
+  document.getElementById('our-phase').textContent=ourPhase;
+  document.getElementById('their-phase').textContent=theirPhase;
+  const log=document.getElementById('log-list');
+  if(log.lastChild)log.removeChild(log.lastChild);
+  if(!history.length)log.innerHTML='<div class="log-row" style="color:var(--text3)">No events tagged yet.</div>';
+  updateStats();
+}
+
+/* ── SAVE MATCH ── */
+function saveMatch(){
+  if(!history.length){alert('No events to save.');return;}
+  const opponent=prompt('Opponent name (optional):','');
+  const score=prompt('Final score (e.g. 24-17):','');
+  const matches=JSON.parse(localStorage.getItem('rugby-matches')||'[]');
+  const off=history.filter(h=>h.o==='made'||h.o==='not');
+  const def=history.filter(h=>h.o==='held'||h.o==='beat');
+  const offMade=off.filter(h=>h.o==='made').length;
+  const defHeld=def.filter(h=>h.o==='held').length;
+  const tryUs=history.filter(h=>h.o==='try-us').length;
+  const tryThem=history.filter(h=>h.o==='try-them').length;
+  const rates=[];
+  if(off.length)rates.push(offMade/off.length);
+  if(def.length)rates.push(defHeld/def.length);
+  const dom=rates.length?Math.round(rates.reduce((a,b)=>a+b,0)/rates.length*100):0;
+  matches.push({
+    id:Date.now(),date:new Date().toLocaleDateString(),opponent:opponent||'Unknown',
+    score:score||'—',events:history.length,dom,tryUs,tryThem,
+    tallies:{...tallies},
+    zones:{
+      att:{total:history.filter(h=>h.zone==='att').length,offMade:history.filter(h=>h.zone==='att'&&h.o==='made').length,defHeld:history.filter(h=>h.zone==='att'&&h.o==='held').length,tries:history.filter(h=>h.zone==='att'&&(h.o==='try-us'||h.o==='try-them')).length,errors:history.filter(h=>h.zone==='att'&&(h.o==='err-us'||h.o==='err-them')).length},
+      mid:{total:history.filter(h=>h.zone==='mid').length,offMade:history.filter(h=>h.zone==='mid'&&h.o==='made').length,defHeld:history.filter(h=>h.zone==='mid'&&h.o==='held').length,tries:history.filter(h=>h.zone==='mid'&&(h.o==='try-us'||h.o==='try-them')).length,errors:history.filter(h=>h.zone==='mid'&&(h.o==='err-us'||h.o==='err-them')).length},
+      def:{total:history.filter(h=>h.zone==='def').length,offMade:history.filter(h=>h.zone==='def'&&h.o==='made').length,defHeld:history.filter(h=>h.zone==='def'&&h.o==='held').length,tries:history.filter(h=>h.zone==='def'&&(h.o==='try-us'||h.o==='try-them')).length,errors:history.filter(h=>h.zone==='def'&&(h.o==='err-us'||h.o==='err-them')).length}
+    },
+    offTotal:off.length,offMade,defTotal:def.length,defHeld,
+    tacklesThem,tacklesUs,
+    avgOurPoss:avg(ourPossessions),avgTheirPoss:avg(theirPossessions),
+    avgOurTry:avg(ourTryPhases),avgTheirTry:avg(theirTryPhases),
+    errUs:history.filter(h=>h.o==='err-us').length,
+    errThem:history.filter(h=>h.o==='err-them').length
+  });
+  localStorage.setItem('rugby-matches',JSON.stringify(matches));
+  alert('Match saved!');
+}
+
+/* ── CSV EXPORT (current match) ── */
+function exportCSV(){
+  if(!history.length){alert('No events to export.');return;}
+  const rows=[['Event','Outcome','Reason','Zone','Phase Us','Phase Them','Team']];
+  history.forEach(h=>rows.push([h.evNum,h.o,h.r,h.zone||'',h.phaseUs,h.phaseThem,h.team||'']));
+  rows.push([]);
+  rows.push(['Metric','Value']);
+  Object.entries(tallies).filter(([k,v])=>v>0).forEach(([k,v])=>rows.push([k,v]));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='rugby-match-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+/* ── CSV EXPORT (all matches) ── */
+function exportAllCSV(){
+  const matches=JSON.parse(localStorage.getItem('rugby-matches')||'[]');
+  if(!matches.length){alert('No saved matches.');return;}
+  const rows=[['Date','Opponent','Score','Events','Dominance','Our Tries','Opp Tries','Our Errors','Their Errors','Tackles on Us','Our Tackles','Avg Phases Us','Avg Phases Them','Avg Phase Try Us','Avg Phase Try Them']];
+  matches.forEach(m=>rows.push([m.date,m.opponent,m.score,m.events,m.dom,m.tryUs,m.tryThem,m.errUs||0,m.errThem||0,m.tacklesThem||0,m.tacklesUs||0,m.avgOurPoss!==null?m.avgOurPoss?.toFixed(1):'',m.avgTheirPoss!==null?m.avgTheirPoss?.toFixed(1):'',m.avgOurTry!==null?m.avgOurTry?.toFixed(1):'',m.avgTheirTry!==null?m.avgTheirTry?.toFixed(1):'']));
+  const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='rugby-all-matches-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+/* ── REPORT ── */
+function buildReport(){
+  const off=history.filter(h=>h.o==='made'||h.o==='not');
+  const def=history.filter(h=>h.o==='held'||h.o==='beat');
+  const offMade=off.filter(h=>h.o==='made').length;
+  const defHeld=def.filter(h=>h.o==='held').length;
+  const tryUs=history.filter(h=>h.o==='try-us').length;
+  const tryThem=history.filter(h=>h.o==='try-them').length;
+  const errUs=history.filter(h=>h.o==='err-us').length;
+  const errThem=history.filter(h=>h.o==='err-them').length;
+  const offRate=off.length?Math.round(offMade/off.length*100):0;
+  const defRate=def.length?Math.round(defHeld/def.length*100):0;
+  // five-component dominance
+  const tryDiff=tryUs-tryThem;
+  const tryScore=Math.min(100,Math.max(0,50+(tryDiff*10)));
+  const carryRates=[];if(off.length)carryRates.push(offMade/off.length);if(def.length)carryRates.push(defHeld/def.length);
+  const carryScore=carryRates.length?carryRates.reduce((a,b)=>a+b,0)/carryRates.length*100:50;
+  const totalErrors=errUs+errThem;
+  const errScore=totalErrors>0?Math.min(100,Math.max(0,(errThem/totalErrors)*100)):50;
+  const aop=avg(ourPossessions),atp=avg(theirPossessions),aot=avg(ourTryPhases),att_=avg(theirTryPhases);
+  const phaseScore=(()=>{if(aop!==null&&atp!==null){return Math.min(100,Math.max(0,50+((aop-atp)*10)));}if(aop!==null)return Math.min(100,Math.max(0,(aop/6)*100));return 50;})();
+  const bm=history.filter(h=>h.o==='bmade'||h.o==='bnot');
+  const bmGood_=history.filter(h=>h.o==='bmade').length;
+  const bmScore=bm.length?Math.round(bmGood_/bm.length*100):50;
+  const dom=Math.round(tryScore*0.30+carryScore*0.25+errScore*0.20+phaseScore*0.15+bmScore*0.10);
+  const lb=history.filter(h=>h.r==='Ran through a hole'||h.r==='Broke tackle'||h.r==='BM: Line break'||h.r==='Try: Line break').length;
+  const domColor=dom>=60?'#639922':dom>=45?'#BA7517':'#A32D2D';
+  const domLabel=dom>=70?'Strong dominance':dom>=55?'Slight advantage':dom>=45?'Evenly contested':dom>=30?'Under pressure':'Being dominated';
+
+  /* zone cards */
+  const zoneHtml=['att','mid','def'].map(z=>{
+    const zd={total:history.filter(h=>h.zone===z).length,offMade:history.filter(h=>h.zone===z&&h.o==='made').length,defHeld:history.filter(h=>h.zone===z&&h.o==='held').length,tries:history.filter(h=>h.zone===z&&(h.o==='try-us'||h.o==='try-them')).length,errors:history.filter(h=>h.zone===z&&(h.o==='err-us'||h.o==='err-them')).length};
+    const mx=Math.max(zd.offMade,zd.defHeld,zd.tries,zd.errors,1);
+    const titles={att:'Attacking third',mid:'Middle third',def:'Defensive third'};
+    const cols={att:'var(--green)',mid:'var(--blue)',def:'var(--amber)'};
+    return`<div class="zrcard"><div class="zr-title" style="color:${cols[z]}">${titles[z]}<span style="font-size:9px;color:var(--text3);margin-left:4px">${zd.total} events</span></div>`
+      +[{l:'Off. success',v:zd.offMade,c:'#639922'},{l:'Def. held',v:zd.defHeld,c:'#185FA5'},{l:'Tries',v:zd.tries,c:'#0F6E56'},{l:'Errors',v:zd.errors,c:'#A32D2D'}]
+      .map(r=>`<div class="zr-bar-row"><div class="zr-bar-label">${r.l}</div><div class="zr-bar-track"><div class="zr-bar-fill" style="width:${Math.round(r.v/mx*100)}%;background:${r.c}"></div></div><div class="zr-bar-val">${r.v}</div></div>`).join('')+'</div>';
+  }).join('');
+
+  /* simple ratio bars */
+  const ratioRows=[
+    {l:'Tackles : line breaks',us:tacklesThem,them:lb},
+    {l:'Our errors : their errors',us:errUs,them:errThem}
+  ].map(r=>{const tot=r.us+r.them||1;const up=Math.round(r.us/tot*100);
+    return`<div class="ratio-viz-row"><span class="rv-label">${r.l}</span><div class="rv-track"><div class="rv-us" style="width:${up}%"></div><div class="rv-them" style="width:${100-up}%"></div></div><span class="rv-val">${r.us}:${r.them}</span></div>`;}).join('');
+
+  /* phase bars */
+  const phaseHtml=['Avg phases / possession','Avg phase at try scored'].map((title,i)=>{
+    const uv=i===0?aop:aot,tv=i===0?atp:att_;const mx=Math.max(uv||0,tv||0,1);
+    const uh=uv!==null?Math.round((uv/mx)*56):0,th=tv!==null?Math.round((tv/mx)*56):0;
+    const note=i===0?'higher = better retention':'lower = quicker strike';
+    return`<div class="phase-ccard"><div class="pc-title">${title}</div><div style="font-size:9px;color:var(--text3);margin-bottom:6px">${note}</div><div class="pc-bars"><div class="pc-bar-w"><div class="pc-val">${uv!==null?uv.toFixed(1):'—'}</div><div class="pc-bar" style="height:${uh}px;background:#B5D4F4"></div><div class="pc-lbl" style="color:var(--blue)">us</div></div><div class="pc-bar-w"><div class="pc-val">${tv!==null?tv.toFixed(1):'—'}</div><div class="pc-bar" style="height:${th}px;background:#F7C1C1"></div><div class="pc-lbl" style="color:var(--red)">them</div></div></div></div>`;}).join('');
+
+  /* ── COMPOSITE DEF ── */
+  const missedTackles=history.filter(h=>h.r==='Missed tackle').length;
+  const linesBrokenAgainst=history.filter(h=>h.r==='Line broken').length;
+  const holdRate=def.length?defHeld/def.length:0;
+  const missedRate=def.length?missedTackles/def.length:0;
+  const avgTheirPossVal=avg(theirPossessions);
+  const phaseDefScore=avgTheirPossVal!==null?Math.min(100,((avgTheirPossVal-1)/7)*100):null;
+  const defWeighted=
+    holdRate*100*0.30+
+    Math.max(0,100-tryThem*10)*0.25+
+    Math.max(0,(1-missedRate)*100)*0.20+
+    (phaseDefScore!==null?phaseDefScore:holdRate*100)*0.15+
+    Math.max(0,100-linesBrokenAgainst*10)*0.10;
+  const defFinal=def.length?Math.round(defWeighted):null;
+  const defColor=defFinal!==null?(defFinal>=70?'#639922':defFinal>=50?'#BA7517':'#A32D2D'):'#888780';
+  const effLabels=['Poor','Struggling','Moderate','Good','Excellent'];
+  const defLbl=defFinal===null?'No data':defFinal>=80?effLabels[4]:defFinal>=65?effLabels[3]:defFinal>=50?effLabels[2]:defFinal>=35?effLabels[1]:effLabels[0];
+  const defCompHtml=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:12px;font-weight:500;color:var(--text)">Defensive efficiency</span>
+      <span style="font-size:20px;font-weight:500;color:var(--text)">${defFinal!==null?defFinal+'/100':'—'}</span>
+    </div>
+    <div class="bar-track" style="margin-bottom:6px"><div style="height:100%;border-radius:4px;background:${defColor};width:${defFinal||0}%"></div></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">${defLbl}${def.length?' — based on '+def.length+' opp carries':''}</div>
+    <div style="border-top:0.5px solid var(--border);padding-top:8px">
+      <div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">What contributes</div>
+      <div class="comp-row"><span class="comp-lbl">Hold rate (30%)</span><span class="comp-val">${def.length?Math.round(holdRate*100)+'% held ('+defHeld+'/'+def.length+')':'—'}</span></div>
+      <div class="comp-row"><span class="comp-lbl">Tries conceded (25%)</span><span class="comp-val">${tryThem} tries conceded</span></div>
+      <div class="comp-row"><span class="comp-lbl">Missed tackle rate (20%)</span><span class="comp-val">${missedTackles} missed (${def.length?Math.round(missedRate*100):0}% of carries)</span></div>
+      <div class="comp-row"><span class="comp-lbl">Avg phases forced (15%)</span><span class="comp-val">${avgTheirPossVal!==null?avgTheirPossVal.toFixed(1)+' avg phases forced':'no data yet'}</span></div>
+      <div class="comp-row"><span class="comp-lbl">Line breaks conceded (10%)</span><span class="comp-val">${linesBrokenAgainst} line breaks conceded</span></div>
+    </div>`;
+
+  /* ── COMPOSITE OFF ── */
+  const spotTackles=history.filter(h=>h.r==='Spot tackle').length;
+  const advRate=off.length?offMade/off.length:0;
+  const spotRate=off.length?spotTackles/off.length:0;
+  const avgOurTryVal=avg(ourTryPhases);
+  const phaseOffScore=avgOurTryVal!==null?Math.max(0,100-((avgOurTryVal-1)/9)*100):null;
+  const offWeighted=
+    advRate*100*0.30+
+    Math.min(100,tryUs*12.5)*0.25+
+    Math.max(0,(1-spotRate)*100)*0.20+
+    (phaseOffScore!==null?phaseOffScore:advRate*100)*0.15+
+    Math.min(100,lb*8)*0.10;
+  const offFinal=off.length?Math.round(offWeighted):null;
+  const offColor=offFinal!==null?(offFinal>=70?'#639922':offFinal>=50?'#BA7517':'#A32D2D'):'#888780';
+  const offLbl=offFinal===null?'No data':offFinal>=80?effLabels[4]:offFinal>=65?effLabels[3]:offFinal>=50?effLabels[2]:offFinal>=35?effLabels[1]:effLabels[0];
+  const offCompHtml=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:12px;font-weight:500;color:var(--text)">Offensive efficiency</span>
+      <span style="font-size:20px;font-weight:500;color:var(--text)">${offFinal!==null?offFinal+'/100':'—'}</span>
+    </div>
+    <div class="bar-track" style="margin-bottom:6px"><div style="height:100%;border-radius:4px;background:${offColor};width:${offFinal||0}%"></div></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">${offLbl}${off.length?' — based on '+off.length+' our carries':''}</div>
+    <div style="border-top:0.5px solid var(--border);padding-top:8px">
+      <div style="font-size:10px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">What contributes</div>
+      <div class="comp-row"><span class="comp-lbl">Advantage line rate (30%)</span><span class="comp-val">${off.length?Math.round(advRate*100)+'% made line ('+offMade+'/'+off.length+')':'—'}</span></div>
+      <div class="comp-row"><span class="comp-lbl">Tries scored (25%)</span><span class="comp-val">${tryUs} tries scored</span></div>
+      <div class="comp-row"><span class="comp-lbl">Spot tackle rate (20%)</span><span class="comp-val">${spotTackles} spot tackles (${off.length?Math.round(spotRate*100):0}% of carries)</span></div>
+      <div class="comp-row"><span class="comp-lbl">Avg phases to score (15%)</span><span class="comp-val">${avgOurTryVal!==null?avgOurTryVal.toFixed(1)+' avg phases to score':'no data yet'}</span></div>
+      <div class="comp-row"><span class="comp-lbl">Line breaks made (10%)</span><span class="comp-val">${lb} line breaks made</span></div>
+    </div>`;
+
+  const html=`
+<div class="report-section">
+  <div class="rs-title">Match dominance</div>
+  <div class="rs-blurb">Dominance index ${dom}/100 — ${domLabel}. Offense made the advantage line ${offRate}% of carries; defense held the opposition ${defRate}% of the time.</div>
+  <div class="score-grid">
+    <div class="scard"><div class="scard-l">Dominance</div><div class="scard-v">${dom}</div><div class="scard-s">out of 100</div></div>
+    <div class="scard"><div class="scard-l">Tries</div><div class="scard-v">${tryUs} – ${tryThem}</div><div class="scard-s">us – them</div></div>
+    <div class="scard"><div class="scard-l">Off. success</div><div class="scard-v">${offRate}%</div><div class="scard-s">${offMade}/${off.length} carries</div></div>
+    <div class="scard"><div class="scard-l">Def. success</div><div class="scard-v">${defRate}%</div><div class="scard-s">${defHeld}/${def.length} held</div></div>
+  </div>
+  <div class="dom-bar-wrap">
+    <div class="dom-bar-labels"><span>0</span><span>50 — even</span><span>100</span></div>
+    <div class="dom-track"><div class="dom-fill" style="width:${dom}%;background:${domColor}"></div><div class="dom-mid"></div></div>
+  </div>
+  <div style="border-top:0.5px solid var(--border);padding-top:8px;margin-top:8px">
+    <div style="font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">What contributes</div>
+    <div class="comp-row"><span class="comp-lbl">Try differential (30%)</span><span class="comp-val">${tryUs} scored, ${tryThem} conceded (diff ${tryDiff>0?'+':''}${tryDiff})</span></div>
+    <div class="comp-row"><span class="comp-lbl">Carry battle (25%)</span><span class="comp-val">${offRate}% off / ${defRate}% def</span></div>
+    <div class="comp-row"><span class="comp-lbl">Error differential (20%)</span><span class="comp-val">us ${errUs} vs them ${errThem} ${totalErrors>0?'('+( errUs<errThem?'cleaner':'more errors')+')':''}</span></div>
+    <div class="comp-row"><span class="comp-lbl">Phase retention (15%)</span><span class="comp-val">${aop!==null&&atp!==null?aop.toFixed(1)+' vs '+atp.toFixed(1)+' phases/poss':'no data yet'}</span></div>
+    <div class="comp-row"><span class="comp-lbl">Backs move success (10%)</span><span class="comp-val">${bm.length?bmGood_+'/'+bm.length+' ('+bmScore+'%)':'no backs moves tagged'}</span></div>
+  </div>
+</div>
+<div class="report-section">
+  <div class="rs-title">Performance by zone</div>
+  <div class="rs-blurb">Events, offensive success, defensive holds, tries and errors broken down by pitch third.</div>
+  <div class="zone-rpt-grid">${zoneHtml}</div>
+</div>
+<div class="report-section">
+  <div class="rs-title">Ratios</div>
+  <div class="rs-blurb">Blue = us. Red = them. Error ratio ${errUs}:${errThem} — ${errUs<=errThem?'we were the cleaner team.':'they were the cleaner team.'}</div>
+  <div style="display:flex;gap:12px;font-size:10px;color:var(--text2);margin-bottom:10px"><span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#B5D4F4;display:inline-block"></span>us</span><span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#F7C1C1;display:inline-block"></span>them</span></div>
+  ${ratioRows}
+</div>
+<div class="report-section">
+  <div class="rs-title">Composite efficiency</div>
+  <div class="rs-blurb">Weighted scores combining all relevant metrics for each side of the game. Each component's contribution is shown below the score.</div>
+  <div style="background:var(--bg2);border-radius:var(--radius);padding:12px;margin-bottom:8px">${defCompHtml}</div>
+  <div style="background:var(--bg2);border-radius:var(--radius);padding:12px">${offCompHtml}</div>
+</div>
+<div class="report-section">
+  <div class="rs-title">Phase play</div>
+  <div class="rs-blurb">${aop!==null?`We averaged ${aop.toFixed(1)} phases/possession vs their ${atp!==null?atp.toFixed(1):'n/a'}.`:''} ${aot!==null?`Our tries came at phase ${aot.toFixed(1)} on average vs their ${att_!==null?att_.toFixed(1):'n/a'}.`:''}</div>
+  <div class="phase-compare-wrap">${phaseHtml}</div>
+</div>`;
+
+  document.getElementById('report-empty').style.display='none';
+  document.getElementById('report-content').style.display='block';
+  document.getElementById('report-content').innerHTML=html;
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-report').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ── HISTORY ── */
+function renderHistory(){
+  const matches=JSON.parse(localStorage.getItem('rugby-matches')||'[]');
+  const list=document.getElementById('history-list');
+  if(!matches.length){list.innerHTML='<div class="empty">No saved matches yet.</div>';return;}
+  list.innerHTML=matches.slice().reverse().map(m=>`
+    <div class="hist-card">
+      <div class="hist-date">${m.date}</div>
+      <div class="hist-score">${m.opponent} — ${m.score}</div>
+      <div class="hist-meta">Dominance: ${m.dom}/100 &nbsp;·&nbsp; Tries: ${m.tryUs}–${m.tryThem} &nbsp;·&nbsp; ${m.events} events</div>
+      <div class="hist-actions">
+        <button class="btn" onclick="deleteMatch(${m.id})">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteMatch(id){
+  if(!confirm('Delete this match?'))return;
+  const matches=JSON.parse(localStorage.getItem('rugby-matches')||'[]').filter(m=>m.id!==id);
+  localStorage.setItem('rugby-matches',JSON.stringify(matches));
+  renderHistory();
+}
+
+/* ── SERVICE WORKER ── */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
